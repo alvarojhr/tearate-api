@@ -1,0 +1,52 @@
+{
+  "swagger": "2.0",
+  "paths": {
+    "/exercises": {
+      "post": {
+        "tags": [
+          "exercises"
+        ],
+        "summary": "Creates a new exercise.",
+        "operationId": "createExercise",
+        "parameters": [
+          {
+            "name": "Body",
+            "in": "body",
+            "schema": {
+              "$ref": "#/definitions/Exercise"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "$ref": "#/responses/exerciseResponse"
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Exercise": {
+      "type": "object",
+      "properties": {
+        "exercise_id": {
+          "type": "string",
+          "x-go-name": "ExerciseID"
+        },
+        "name": {
+          "type": "string",
+          "x-go-name": "Name"
+        }
+      },
+      "x-go-package": "github.com/alvarojhr/tearate-api/internal/database/models"
+    }
+  },
+  "responses": {
+    "exerciseResponse": {
+      "description": "",
+      "schema": {
+        "$ref": "#/definitions/Exercise"
+      }
+    }
+  }
+}

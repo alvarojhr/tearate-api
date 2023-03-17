@@ -5,8 +5,13 @@ import (
 	"context"
 	"log"
 
+	"github.com/alvarojhr/tearate-api/internal/database/models"
+
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/google/uuid"
 )
 
 type DynamoDBConnection struct {
@@ -28,4 +33,24 @@ func NewDynamoDBConnection(region string) *DynamoDBConnection {
 	return &DynamoDBConnection{
 		Client: svc,
 	}
+}
+
+func (db *DynamoDBConnection) CreateExercise(exercise *models.Exercise) error {
+	// Generate a new unique ID for the exercise
+	exercise.ExerciseID = uuid.New().String()
+
+	log.Print(exercise)
+
+	item, err := attributevalue.MarshalMap(exercise)
+	if err != nil {
+		return err
+	}
+
+	input := &dynamodb.PutItemInput{
+		Item:      item,
+		TableName: aws.String("Exercises"),
+	}
+
+	_, err = db.Client.PutItem(context.TODO(), input)
+	return err
 }

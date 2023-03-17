@@ -20,6 +20,7 @@ func NewAPIHandler(dbConn *database.DynamoDBConnection) *APIHandler {
 
 	// Define your API routes here
 	router.HandleFunc("/api/hello", apiHandler.HelloWorldHandler)
+	router.HandleFunc("/api/exercises", apiHandler.CreateExercise)
 
 	apiHandler.Handler = router
 	return apiHandler

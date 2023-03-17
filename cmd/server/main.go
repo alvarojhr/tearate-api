@@ -26,10 +26,12 @@ func main() {
 	// Create a new DynamoDB connection
 	dbConn := database.NewDynamoDBConnection(cfg.AWSRegion)
 
-	// Create the DynamoDB tables if they don't exist
-	err = dbConn.CreateTables()
-	if err != nil {
-		log.Fatalf("Failed to create DynamoDB tables: %s", err.Error())
+	if cfg.CreateTables {
+		// Create the DynamoDB tables if they don't exist
+		err = dbConn.CreateTables()
+		if err != nil {
+			log.Fatalf("Failed to create DynamoDB tables: %s", err.Error())
+		}
 	}
 
 	apiHandler := api.NewAPIHandler(dbConn)
