@@ -50,3 +50,20 @@ func (a *APIHandler) CreateExercise(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(exercise)
 }
+
+func (a *APIHandler) GetAllExercises(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Call a function to get all exercises from DynamoDB
+	exercises, err := a.dbConn.GetAllExercises()
+	if err != nil {
+		http.Error(w, "Failed to retrieve exercises", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(exercises)
+}
