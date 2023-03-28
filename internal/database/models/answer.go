@@ -5,5 +5,6 @@ type Answer struct {
 	QuestionID string  `json:"question_id" dynamodbav:"question_id"`
 	StudentID  string  `json:"student_id" dynamodbav:"student_id"`
 	Response   string  `json:"response" dynamodbav:"response"`
-	Rate       float32 `json:"points" dynamodbav:"points"`
+	Rate       float32 `json:"rate" dynamodbav:"rate"`
+	Feedback   string  `json:"feedback" dynamodbav:"feedback"`
 }

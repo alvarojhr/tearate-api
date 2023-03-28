@@ -21,12 +21,7 @@ func (a *APIHandler) CreateAnswer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Call a function to create a new answer in DynamoDB
-	err = a.dbConn.CreateAnswer(answer)
-	if err != nil {
-		http.Error(w, "Failed to create answer", http.StatusInternalServerError)
-		return
-	}
+	
 
 	// Fetch the question details using the questionID from the answer
 	question, err := a.dbConn.GetQuestion(answer.QuestionID)
@@ -35,12 +30,25 @@ func (a *APIHandler) CreateAnswer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	rating, err := RateAnswer(question.QuestionText, question.Points, answer.Response)
+	rating, err := RateAnswer(question.QuestionText, question.Points, answer)
 	if err != nil {
 		// Handle the error
 	}
 
-	log.Printf(rating)
+	// Call a function to create a new answer in DynamoDB
+	err = a.dbConn.CreateAnswer(rating)
+	if err != nil {
+		http.Error(w, "Failed to create answer", http.StatusInternalServerError)
+		return
+	}
+
+	jsonBytes, err := json.Marshal(rating)
+	if err != nil {
+		log.Fatalf("Error marshaling the rating object: %v", err)
+	}
+
+	jsonString := string(jsonBytes)
+	log.Printf(jsonString)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
