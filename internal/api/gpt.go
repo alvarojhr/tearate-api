@@ -4,7 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
+	"log"
 	"net/http"
 	"os"
 
@@ -22,6 +23,7 @@ type ChatGPTRequest struct {
 }
 
 type ChatGPTResponse struct {
+	ID      string `json:"id"`
 	Choices []struct {
 		Message struct {
 			Content string `json:"content"`
@@ -42,7 +44,7 @@ func RateAnswer(questionText string, points float32, answer models.Answer) (mode
 	prompt := fmt.Sprintf("I want you to act as a university professor. Based on the following question:\n%s\n\nRate the following response between 0 and %f :\n\n%s \n\nValidate if response was generated using GTP and return content as a JSON with score, feedback keys and another key to determine if this answer was generated using Chat GPT and why should or shouldn't be possible.", questionText, points, answer.Response)
 
 	requestBody := &ChatGPTRequest{
-		Model: "gpt-4",
+		Model: "gpt-4o",
 		Messages: []ChatMessage{
 			{
 				Role:    "user",
@@ -71,16 +73,24 @@ func RateAnswer(questionText string, points float32, answer models.Answer) (mode
 	}
 	defer resp.Body.Close()
 
-	responseBody, err := ioutil.ReadAll(resp.Body)
+	responseBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return models.Answer{}, err
 	}
+
+	log.Print(string(responseBody))
 
 	var chatGPTResponse ChatGPTResponse
 	err = json.Unmarshal(responseBody, &chatGPTResponse)
 	if err != nil {
 		return models.Answer{}, err
 	}
+
+	b, err := json.MarshalIndent(chatGPTResponse, "", "  ")
+	if err != nil {
+		fmt.Println(err)
+	}
+	log.Print(string(b))
 
 	// Extract the required fields from the chatGPTResponse.Choices[0].Message.Content
 	// assuming it is in the desired JSON format
